@@ -2,7 +2,25 @@
 Enhanced Medicare Coverage Determination System
 ================================================
 Processes NCD, LCD, and Article databases to determine Medicare coverage.
-
+SELECT
+    s.state_abbrev,
+    g.paragraph,
+    h.hcpc_code_id
+FROM
+    (
+        (
+            (
+                state_lookup AS s
+                INNER JOIN contractor_jurisdiction AS c ON s.state_id = c.state_id
+            )
+            INNER JOIN article_x_contractor AS x ON c.contractor_id = x.contractor_id
+        )
+        INNER JOIN article_x_hcpc_code_group AS g ON x.article_id = g.article_id
+    )
+    INNER JOIN article_x_hcpc_code AS h ON h.article_id = g.article_id
+    AND h.hcpc_code_group = g.hcpc_code_group
+WHERE
+    g.paragraph <> '';
 Requirements:
 pip install pandas pyodbc chromadb ollama
 """
